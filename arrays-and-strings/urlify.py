@@ -1,23 +1,27 @@
 def urlify(chars, str_length):
-  last_index = len(chars) - 1
+  num_of_spaces = len([char for char in chars[:str_length] if char == ' '])
+  last_index = str_length + num_of_spaces * 2
+
+  if last_index < len(chars):
+    chars[last_index] = '\0'
 
   for i in range(str_length - 1, -1, -1):
-    if chars[i] != ' ':
-      chars[last_index] = chars[i]
-      last_index -= 1
-    else: 
-      chars[last_index] = '0'
-      chars[last_index - 1] = '2'
-      chars[last_index - 2] = '%'
+    if chars[i] == ' ':
+      chars[last_index - 1] = '0'
+      chars[last_index - 2] = '2'
+      chars[last_index - 3] = '%'
       last_index -= 3
+    else: 
+      chars[last_index - 1] = chars[i]
+      last_index -= 1
 
-  return ''.join(chars)
+  return ''.join(chars).split('\0')[0]
 
 
 
 if __name__ == '__main__':
-  assert urlify(list('Mr John Smith    '), 13) == 'Mr%20John%20Smith'
+  assert urlify(list('Mr John Smith      '), 13) == 'Mr%20John%20Smith'
   assert urlify(list('nospaces'), 8) == 'nospaces'
   assert urlify(list('Mr  Two Spaces      '), 14) == 'Mr%20%20Two%20Spaces'
-  assert urlify(list('spaceAtTheEnd   '), 14) == 'spaceAtTheEnd%20'
+  assert urlify(list('spaceAtTheEnd     '), 14) == 'spaceAtTheEnd%20'
   assert urlify(list(' spaceAtTheBegining  '), 19) == '%20spaceAtTheBegining'
